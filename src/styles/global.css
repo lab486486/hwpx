@@ -121,8 +121,6 @@ button, input { font: inherit; }
 .nav a { color: var(--muted); }
 .nav a:hover, .nav a[aria-current="page"] { color: var(--ink); }
 
-.menu-toggle { display: none; }
-
 .menu-toggle-bars,
 .menu-toggle-bars::before,
 .menu-toggle-bars::after {
@@ -164,6 +162,8 @@ button, input { font: inherit; }
   background: var(--bg-elev);
   color: var(--ink);
 }
+
+.icon-btn.menu-toggle { display: none; }
 
 .btn {
   display: inline-flex;
@@ -479,7 +479,7 @@ button, input { font: inherit; }
   .feature-grid { grid-template-columns: 1fr; }
   .stat-grid { grid-template-columns: 1fr; }
   .header-inner { padding: 10px 0; }
-  .menu-toggle { display: grid; }
+  .icon-btn.menu-toggle { display: grid; }
   .nav {
     display: none;
     position: absolute;
