@@ -8,12 +8,12 @@ backend:
   name: github
   repo: lab486486/hwpx
   branch: main
-  base_url: https://www.hwpx.co.kr
+  base_url: https://hwpx-bp0.pages.dev
   auth_endpoint: api/oauth/auth
   auth_scope: repo
   squash_merges: true
 
-local_backend: false
+local_backend: true
 
 media_folder: public/uploads
 public_folder: /uploads
@@ -43,11 +43,13 @@ collections:
       - label: URL 연도
         name: year
         widget: string
-        hint: "퍼머링크 /YYYY/MM/slug.html 의 연도. 예: 2025"
+        default: "2026"
+        hint: "퍼머링크 /YYYY/MM/slug.html 의 연도. 예: 2026"
       - label: URL 월
         name: month
         widget: string
-        hint: "두 자리 월. 예: 07"
+        default: "09"
+        hint: "두 자리 월. 예: 09"
       - label: 파일명 슬러그
         name: slug
         widget: string

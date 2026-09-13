@@ -3,7 +3,4 @@
 /rss.xml/ /rss 301
 /feeds/posts/default /rss 301
 /feeds/posts/default/* /rss 301
-/search /search.html 200
 /search/label/:tag /label/:tag.html 301
-/p/privacy-policy /p/privacy-policy.html 301
-/alhangeul /alhangeul.html 301

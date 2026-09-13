@@ -5,23 +5,24 @@ import { nav, site } from "../data/site";
 <header class="site-header" id="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="/">
-      <span class="brand-mark" aria-hidden="true">한</span>
-      <span>
-        <strong>{site.name}</strong>
-        <span>{site.tagline}</span>
-      </span>
+      <img class="brand-logo" src="/logo.png" alt="" width="36" height="36" />
+      <strong>{site.name}</strong>
     </a>
-    <nav class="nav" aria-label="주요 메뉴">
-      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
-      <a href="/rss">RSS</a>
-    </nav>
-    <div class="header-actions">
-      <form class="search-form" action="/search.html" method="get">
-        <label class="sr-only" for="header-q">검색</label>
-        <input id="header-q" name="q" type="search" placeholder="글 검색" />
-        <button type="submit">찾기</button>
-      </form>
+    <div class="header-end">
+      <nav class="nav" id="site-nav" aria-label="주요 메뉴">
+        {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      </nav>
       <button class="icon-btn" id="theme-toggle" type="button" aria-label="테마 바꾸기">◐</button>
+      <button
+        class="icon-btn menu-toggle"
+        id="menu-toggle"
+        type="button"
+        aria-label="메뉴 열기"
+        aria-controls="site-nav"
+        aria-expanded="false"
+      >
+        <span class="menu-toggle-bars" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
 </header>
@@ -29,6 +30,8 @@ import { nav, site } from "../data/site";
 <script>
   const header = document.getElementById("site-header");
   const toggle = document.getElementById("theme-toggle");
+  const menuToggle = document.getElementById("menu-toggle");
+  const nav = document.getElementById("site-nav");
   const key = "hwpx-theme";
 
   const onScroll = () => header?.classList.toggle("is-scrolled", window.scrollY > 12);
@@ -39,5 +42,20 @@ import { nav, site } from "../data/site";
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
     localStorage.setItem(key, next);
+  });
+
+  const setMenu = (open: boolean) => {
+    nav?.classList.toggle("is-open", open);
+    menuToggle?.setAttribute("aria-expanded", String(open));
+    menuToggle?.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
+    document.body.classList.toggle("nav-open", open);
+  };
+
+  menuToggle?.addEventListener("click", () => {
+    setMenu(!nav?.classList.contains("is-open"));
+  });
+
+  nav?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setMenu(false));
   });
 </script>

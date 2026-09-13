@@ -27,7 +27,7 @@ export async function publicPages() {
   const latest = posts[0]?.data.date;
   return [
     { loc: absUrl("/"), lastmod: latest, changefreq: "daily", priority: "1.0" },
-    { loc: absUrl("/alhangeul.html"), changefreq: "weekly", priority: "0.8" },
+    { loc: absUrl("/alhangeul"), changefreq: "weekly", priority: "0.8" },
     { loc: absUrl("/search.html"), changefreq: "weekly", priority: "0.4" },
     { loc: absUrl("/p/privacy-policy.html"), changefreq: "yearly", priority: "0.2" },
     ...posts.map((post) => ({

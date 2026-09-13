@@ -8,10 +8,10 @@ export const site = {
 };
 
 export const nav = [
-  { label: "글", href: "/#posts" },
+  { label: "소개", href: "/" },
   { label: "한글뷰어", href: "/2025/07/hancom-viewer.html" },
-  { label: "알한글", href: "/alhangeul.html" },
-  { label: "검색", href: "/search.html" },
+  { label: "알한글", href: "/alhangeul" },
+  { label: "블로그", href: "/#posts" },
 ];
 
 export const alhangeul = {

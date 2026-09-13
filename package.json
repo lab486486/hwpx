@@ -11,7 +11,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "import:atom": "node scripts/import-atom.mjs"
+    "import:atom": "node scripts/import-atom.mjs",
+    "cms": "npx --yes decap-server"
   },
   "dependencies": {
     "astro": "^5.8.0",
