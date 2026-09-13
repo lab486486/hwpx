@@ -1,0 +1,16 @@
+---
+import { site } from "../data/site";
+---
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <p>© {new Date().getFullYear()} {site.name} · {site.url.replace("https://", "")}</p>
+    <nav>
+      <a href="/alhangeul.html">알한글</a>
+      ·
+      <a href="/p/privacy-policy.html">개인정보처리방침</a>
+      ·
+      <a href="/rss">RSS</a>
+    </nav>
+  </div>
+</footer>

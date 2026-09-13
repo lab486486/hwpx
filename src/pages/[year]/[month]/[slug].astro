@@ -1,0 +1,81 @@
+---
+import { render } from "astro:content";
+import Base from "../../../layouts/Base.astro";
+import {
+  formatDate,
+  getBlogPosts,
+  labelPath,
+  postPath,
+  relatedPosts,
+  type Post,
+} from "../../../lib/posts";
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+  return posts.map((post) => ({
+    params: {
+      year: post.data.year,
+      month: post.data.month,
+      slug: post.data.slug,
+    },
+    props: { post, related: relatedPosts(post, posts) },
+  }));
+}
+
+interface Props {
+  post: Post;
+  related: Post[];
+}
+
+const { post, related } = Astro.props;
+const { Content } = await render(post);
+const path = postPath(post);
+---
+
+<Base
+  title={post.data.title}
+  description={post.data.description}
+  ogImage={post.data.cover_image}
+  ogType="article"
+  canonicalPath={path}
+  published={post.data.date}
+>
+  <article class="article wrap">
+    <p class="kicker">{formatDate(post.data.date)}</p>
+    <h1>{post.data.title}</h1>
+    <p class="lede">{post.data.description}</p>
+    {
+      post.data.cover_image && (
+        <figure class="cover">
+          <img src={post.data.cover_image} alt="" />
+        </figure>
+      )
+    }
+    <div class="prose">
+      <Content />
+    </div>
+    {
+      post.data.tags.length > 0 && (
+        <p class="tags">
+          {post.data.tags.map((tag) => (
+            <a href={labelPath(tag)}>#{tag}</a>
+          ))}
+        </p>
+      )
+    }
+    {
+      related.length > 0 && (
+        <aside class="related">
+          <h2>함께 보면 좋은 글</h2>
+          <ul>
+            {related.map((item) => (
+              <li>
+                <a href={postPath(item)}>{item.data.title}</a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+  </article>
+</Base>

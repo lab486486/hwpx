@@ -1,0 +1,57 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="검색" description="한글뷰어 글 검색" canonicalPath="/search.html">
+  <section class="hero wrap">
+    <p class="eyebrow">찾기</p>
+    <h1>검색</h1>
+    <p class="lede">제목, 설명, 태그에서 찾습니다.</p>
+    <form class="search-form" action="/search.html" method="get">
+      <input id="q" name="q" type="search" placeholder="검색어" />
+      <button type="submit">찾기</button>
+    </form>
+  </section>
+  <section class="wrap">
+    <p id="search-status" class="lede">검색어를 입력하세요.</p>
+    <div id="search-results" class="search-results"></div>
+  </section>
+</Base>
+
+<script>
+  import Fuse from "fuse.js";
+
+  type Item = {
+    title: string;
+    description: string;
+    href: string;
+    tags: string[];
+    date: string;
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get("q")?.trim() ?? "";
+  const input = document.querySelector<HTMLInputElement>("#q");
+  const status = document.getElementById("search-status");
+  const results = document.getElementById("search-results");
+  if (input) input.value = query;
+
+  const index = (await fetch("/search-index.json").then((res) => res.json())) as Item[];
+  const fuse = new Fuse(index, {
+    threshold: 0.35,
+    keys: ["title", "description", "tags"],
+  });
+
+  if (query && status && results) {
+    const matches = fuse.search(query).map((row) => row.item);
+    status.textContent = matches.length
+      ? `"${query}" 검색 결과 ${matches.length}개`
+      : `"${query}"에 해당하는 글이 없습니다.`;
+    results.innerHTML = matches
+      .map(
+        (item) =>
+          `<article class="search-item"><a href="${item.href}"><h3>${item.title}</h3><p>${item.description}</p></a></article>`,
+      )
+      .join("");
+  }
+</script>

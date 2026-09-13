@@ -1,0 +1,30 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostCard from "../../components/PostCard.astro";
+import Pager from "../../components/Pager.astro";
+import { getBlogPosts, paginate } from "../../lib/posts";
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+  const { pages, pageItems } = paginate(posts);
+  return Array.from({ length: pages }, (_, i) => i + 1)
+    .filter((n) => n > 1)
+    .map((n) => ({
+      params: { n: String(n) },
+      props: { n, pages, posts: pageItems(n), total: posts.length },
+    }));
+}
+
+const { n, pages, posts, total } = Astro.props;
+---
+
+<Base title={`글 목록 ${n}페이지`} description={`한글뷰어 글 목록 ${n}페이지`} canonicalPath={`/page/${n}.html`}>
+  <section class="hero wrap">
+    <h1>{n}페이지</h1>
+    <p class="lede">전체 {total}편</p>
+  </section>
+  <section class="wrap post-grid">
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+  <Pager current={n} total={pages} hrefFor={(page) => (page === 1 ? "/" : `/page/${page}.html`)} />
+</Base>

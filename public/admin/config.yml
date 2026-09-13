@@ -1,0 +1,58 @@
+# Decap CMS — www.hwpx.co.kr
+# GitHub OAuth: Pages secrets GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET
+# Callback: https://<pages-host>/api/oauth/callback
+
+locale: ko
+
+backend:
+  name: github
+  repo: lab486486/hwpx
+  branch: main
+  base_url: https://www.hwpx.co.kr
+  auth_endpoint: api/oauth/auth
+  auth_scope: repo
+  squash_merges: true
+
+local_backend: false
+
+media_folder: public/uploads
+public_folder: /uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: blog
+    label: 글
+    label_singular: 글
+    folder: src/content/blog
+    create: true
+    slug: "{{year}}-{{month}}-{{slug}}"
+    extension: md
+    format: frontmatter
+    fields:
+      - { label: 제목, name: title, widget: string }
+      - label: 날짜
+        name: date
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        default: "{{now}}"
+      - label: URL 연도
+        name: year
+        widget: string
+        hint: "퍼머링크 /YYYY/MM/slug.html 의 연도. 예: 2025"
+      - label: URL 월
+        name: month
+        widget: string
+        hint: "두 자리 월. 예: 07"
+      - label: 파일명 슬러그
+        name: slug
+        widget: string
+        hint: "예: hancom-viewer → /2025/07/hancom-viewer.html"
+      - { label: 설명, name: description, widget: text }
+      - { label: 커버 이미지, name: cover_image, widget: image, required: false }
+      - { label: 태그, name: tags, widget: list, required: false }
+      - { label: 본문, name: body, widget: markdown }

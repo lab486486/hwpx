@@ -1,0 +1,27 @@
+---
+import { formatDate, postPath, type Post } from "../lib/posts";
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const href = postPath(post);
+---
+
+<article class="post-card">
+  <a href={href}>
+    {
+      post.data.cover_image ? (
+        <img src={post.data.cover_image} alt="" width="640" height="360" loading="lazy" />
+      ) : (
+        <img src="/og.svg" alt="" width="640" height="360" loading="lazy" />
+      )
+    }
+    <div class="body">
+      <p class="meta">{formatDate(post.data.date)}</p>
+      <h2>{post.data.title}</h2>
+      <p>{post.data.description}</p>
+    </div>
+  </a>
+</article>

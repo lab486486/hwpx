@@ -1,0 +1,43 @@
+---
+import { nav, site } from "../data/site";
+---
+
+<header class="site-header" id="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">한</span>
+      <span>
+        <strong>{site.name}</strong>
+        <span>{site.tagline}</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="주요 메뉴">
+      {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      <a href="/rss">RSS</a>
+    </nav>
+    <div class="header-actions">
+      <form class="search-form" action="/search.html" method="get">
+        <label class="sr-only" for="header-q">검색</label>
+        <input id="header-q" name="q" type="search" placeholder="글 검색" />
+        <button type="submit">찾기</button>
+      </form>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="테마 바꾸기">◐</button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.getElementById("site-header");
+  const toggle = document.getElementById("theme-toggle");
+  const key = "hwpx-theme";
+
+  const onScroll = () => header?.classList.toggle("is-scrolled", window.scrollY > 12);
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  toggle?.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem(key, next);
+  });
+</script>

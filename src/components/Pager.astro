@@ -1,0 +1,24 @@
+---
+interface Props {
+  current: number;
+  total: number;
+  hrefFor: (n: number) => string;
+}
+
+const { current, total, hrefFor } = Astro.props;
+const pages = Array.from({ length: total }, (_, i) => i + 1);
+---
+
+{
+  total > 1 && (
+    <nav class="pager" aria-label="페이지">
+      {pages.map((n) =>
+        n === current ? (
+          <span class="current">{n}</span>
+        ) : (
+          <a href={hrefFor(n)}>{n}</a>
+        ),
+      )}
+    </nav>
+  )
+}

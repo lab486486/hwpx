@@ -1,0 +1,102 @@
+---
+import Base from "../layouts/Base.astro";
+import PostCard from "../components/PostCard.astro";
+import Pager from "../components/Pager.astro";
+import { alhangeul, site } from "../data/site";
+import { getBlogPosts, paginate } from "../lib/posts";
+
+const posts = await getBlogPosts();
+const { pages, pageItems } = paginate(posts);
+const latest = pageItems(1);
+---
+
+<Base title={site.name} description={site.description} canonicalPath="/">
+  <section class="hero wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">✦ HWP · HWPX · 한글뷰어</p>
+        <h1>한글 파일을<br />더 쉽게 엽니다</h1>
+        <p class="lede">
+          Windows 공식 뷰어부터 Mac용 오픈소스 알한글까지, 한글 문서를 여는 방법을 한곳에 모았습니다.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-accent" href="/2025/07/hancom-viewer.html">한글 뷰어 받기</a>
+          <a class="btn btn-ghost" href="/alhangeul.html">Mac용 알한글</a>
+        </div>
+      </div>
+      <aside class="hero-panel">
+        <p class="eyebrow">도메인답게, 한글로</p>
+        <h2 style="margin:10px 0 8px; letter-spacing:-0.04em;">hwpx.co.kr</h2>
+        <p class="lede">.hwp / .hwpx를 여는 실무 안내와 Mac 네이티브 도구를 소개합니다.</p>
+        <div class="stat-grid">
+          <div><strong>{posts.length}</strong><span>가이드</span></div>
+          <div><strong>무료</strong><span>뷰어 중심</span></div>
+          <div><strong>Mac</strong><span>알한글 추천</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">필요한 것만</p>
+        <h2>한글 문서를 다루는 세 가지 길</h2>
+      </div>
+    </div>
+    <div class="feature-grid">
+      <article class="feature-card">
+        <p class="eyebrow">Windows</p>
+        <h3>공식 한글 뷰어</h3>
+        <p>한컴이 제공하는 무료 뷰어로 HWP, 한셀, 한쇼를 엽니다. 편집이 필요 없을 때 가장 안전한 선택입니다.</p>
+      </article>
+      <article class="feature-card">
+        <p class="eyebrow">macOS</p>
+        <h3>알한글 오픈소스</h3>
+        <p>Quick Look, 썸네일, Spotlight, PDF 내보내기까지. 파일을 웹에 올리지 않고 Mac에서 바로 봅니다.</p>
+      </article>
+      <article class="feature-card">
+        <p class="eyebrow">웹</p>
+        <h3>브라우저로 열기</h3>
+        <p>웨일 브라우저나 폴라리스 오피스처럼 설치를 줄이고 바로 확인하고 싶을 때 쓰는 방법입니다.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <article class="panel alhangeul-banner">
+      <div>
+        <p class="eyebrow">추천 · {alhangeul.version}</p>
+        <h2>{alhangeul.name}</h2>
+        <p>{alhangeul.tagline}</p>
+        <p>{alhangeul.description}</p>
+        <div class="hero-actions">
+          <a class="btn btn-accent" href={alhangeul.dmg}>DMG 다운로드</a>
+          <a class="btn btn-ghost" href="/alhangeul.html">설치 가이드</a>
+        </div>
+      </div>
+      <div>
+        <ul class="alhangeul-list">
+          <li>스페이스바로 HWP/HWPX 미리보기</li>
+          <li>Finder 썸네일과 Spotlight 본문 검색</li>
+          <li>로컬 저장, 공유, PDF 내보내기</li>
+          <li>Intel · Apple Silicon 공용 서명 DMG</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <section class="section wrap" id="posts">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">가이드</p>
+        <h2>최근 글</h2>
+      </div>
+      <p class="lede">전체 {posts.length}편</p>
+    </div>
+  </section>
+  <section class="wrap post-grid">
+    {latest.map((post) => <PostCard post={post} />)}
+  </section>
+  <Pager current={1} total={pages} hrefFor={(n) => (n === 1 ? "/" : `/page/${n}.html`)} />
+</Base>

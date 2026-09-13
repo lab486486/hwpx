@@ -1,0 +1,24 @@
+{
+  "name": "hwpx",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "import:atom": "node scripts/import-atom.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.8.0",
+    "fuse.js": "^7.5.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "typescript": "^5.8.0"
+  }
+}

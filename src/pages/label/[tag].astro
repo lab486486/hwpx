@@ -1,0 +1,27 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostCard from "../../components/PostCard.astro";
+import { getBlogPosts, labelPath, postsByTag } from "../../lib/posts";
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+  const tags = [...new Set(posts.flatMap((post) => post.data.tags))];
+  return tags.map((tag) => ({
+    params: { tag },
+    props: { tag, posts: postsByTag(posts, tag) },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Base title={tag} description={`${tag} 관련 글`} canonicalPath={labelPath(tag)}>
+  <section class="hero wrap">
+    <p class="eyebrow">태그</p>
+    <h1>{tag}</h1>
+    <p class="lede">{posts.length}편</p>
+  </section>
+  <section class="wrap post-grid">
+    {posts.map((post) => <PostCard post={post} />)}
+  </section>
+</Base>
