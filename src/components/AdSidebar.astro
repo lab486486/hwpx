@@ -1,0 +1,15 @@
+---
+import { adsense } from "../data/adsense";
+---
+
+<aside class="ad-sidebar" aria-label="광고">
+  <ins
+    class="adsbygoogle"
+    style="display:inline-block;width:300px;height:600px"
+    data-ad-client={adsense.client}
+    data-ad-slot={adsense.sidebarSlot}></ins>
+</aside>
+
+<script is:inline>
+  (window.adsbygoogle = window.adsbygoogle || []).push({});
+</script>

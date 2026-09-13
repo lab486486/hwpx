@@ -1,6 +1,7 @@
 ---
 import { render } from "astro:content";
 import Base from "../../../layouts/Base.astro";
+import AdSidebar from "../../../components/AdSidebar.astro";
 import {
   formatDate,
   getBlogPosts,
@@ -40,42 +41,45 @@ const path = postPath(post);
   canonicalPath={path}
   published={post.data.date}
 >
-  <article class="article wrap">
-    <p class="kicker">{formatDate(post.data.date)}</p>
-    <h1>{post.data.title}</h1>
-    <p class="lede">{post.data.description}</p>
-    {
-      post.data.cover_image && (
-        <figure class="cover">
-          <img src={post.data.cover_image} alt="" />
-        </figure>
-      )
-    }
-    <div class="prose">
-      <Content />
-    </div>
-    {
-      post.data.tags.length > 0 && (
-        <p class="tags">
-          {post.data.tags.map((tag) => (
-            <a href={labelPath(tag)}>#{tag}</a>
-          ))}
-        </p>
-      )
-    }
-    {
-      related.length > 0 && (
-        <aside class="related">
-          <h2>함께 보면 좋은 글</h2>
-          <ul>
-            {related.map((item) => (
-              <li>
-                <a href={postPath(item)}>{item.data.title}</a>
-              </li>
+  <div class="article-layout wrap">
+    <article class="article">
+      <p class="kicker">{formatDate(post.data.date)}</p>
+      <h1>{post.data.title}</h1>
+      <p class="lede">{post.data.description}</p>
+      {
+        post.data.cover_image && (
+          <figure class="cover">
+            <img src={post.data.cover_image} alt="" />
+          </figure>
+        )
+      }
+      <div class="prose">
+        <Content />
+      </div>
+      {
+        post.data.tags.length > 0 && (
+          <p class="tags">
+            {post.data.tags.map((tag) => (
+              <a href={labelPath(tag)}>#{tag}</a>
             ))}
-          </ul>
-        </aside>
-      )
-    }
-  </article>
+          </p>
+        )
+      }
+      {
+        related.length > 0 && (
+          <aside class="related">
+            <h2>함께 보면 좋은 글</h2>
+            <ul>
+              {related.map((item) => (
+                <li>
+                  <a href={postPath(item)}>{item.data.title}</a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )
+      }
+    </article>
+    <AdSidebar />
+  </div>
 </Base>
