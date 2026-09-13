@@ -33,8 +33,8 @@ const latest = pageItems(1);
   <section class="section wrap">
     <div class="section-head">
       <div>
-        <p class="eyebrow">필요한 것만</p>
-        <h2>한글 문서를 다루는 세 가지 길</h2>
+        <p class="eyebrow">운영체제별</p>
+        <h2>한글 파일 열기하는 세가지 방법</h2>
       </div>
     </div>
     <div class="feature-grid">
@@ -79,16 +79,7 @@ const latest = pageItems(1);
     </article>
   </section>
 
-  <section class="section wrap" id="posts">
-    <div class="section-head">
-      <div>
-        <p class="eyebrow">가이드</p>
-        <h2>최근 글</h2>
-      </div>
-      <p class="lede">전체 {posts.length}편</p>
-    </div>
-  </section>
-  <section class="wrap post-grid">
+  <section class="wrap post-grid" id="posts">
     {latest.map((post) => <PostCard post={post} />)}
   </section>
   <Pager current={1} total={pages} hrefFor={(n) => (n === 1 ? "/" : `/page/${n}.html`)} />
