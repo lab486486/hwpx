@@ -5,7 +5,7 @@ year: "2026"
 month: "09"
 date: 2026-09-14
 description: "워드프레스는 꾸미기 어렵고, 속도가 느리며, 호스팅 비용까지 든다는 이야기. 테마·블록에디터 한계, SEO·캐싱 플러그인 의존, 블로거에게는 과한 기능과 매달 나가는 웹호스팅비까지 사람들이 말하는 워드프레스의 단점을 정리했습니다."
-cover_image: ""
+cover_image: "/uploads/wordpress-thumbnail.jpg"
 tags:
   - "워드프레스"
   - "워드프레스단점"
