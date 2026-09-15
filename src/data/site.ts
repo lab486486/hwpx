@@ -3,7 +3,8 @@ export const site = {
   tagline: "HWP · HWPX를 여는 가장 짧은 길",
   description:
     "한글(.hwp, .hwpx) 파일을 열기 위한 뷰어 안내와 Mac용 오픈소스 알한글 소개를 모은 사이트입니다.",
-  url: "https://www.hwpx.co.kr",
+  // Apex host: Naver Search Advisor rejects feeds whose inner URLs differ from the registered site (www vs non-www).
+  url: "https://hwpx.co.kr",
   lang: "ko",
 };
 
