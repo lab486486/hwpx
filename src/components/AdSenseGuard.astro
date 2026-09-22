@@ -1,0 +1,133 @@
+---
+/**
+ * Runs before AdSense script tags.
+ * Sets window.__ADS_BLOCKED and tracks suspected ad clicks.
+ * Blocked browsers skip loading adsbygoogle.js entirely.
+ */
+---
+
+<script is:inline>
+  (() => {
+    var MAX_CLICKS = 3;
+    var BLOCK_HOURS = 24;
+    var STORAGE_KEY = "adsense_click_tracker";
+    var DEBOUNCE_MS = 800;
+
+    function readTracker() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function writeTracker(tracker) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tracker));
+      } catch (e) {}
+    }
+
+    function normalize(tracker) {
+      var now = Date.now();
+      if (tracker.blockedUntil && now > tracker.blockedUntil) {
+        return { count: 0, blockedUntil: 0 };
+      }
+      return {
+        count: Number(tracker.count) || 0,
+        blockedUntil: Number(tracker.blockedUntil) || 0,
+      };
+    }
+
+    function isBlocked(tracker) {
+      var now = Date.now();
+      return tracker.count >= MAX_CLICKS && now < tracker.blockedUntil;
+    }
+
+    function unloadAds() {
+      document.querySelectorAll("ins.adsbygoogle, .ad-sidebar").forEach(function (el) {
+        el.remove();
+      });
+      document
+        .querySelectorAll('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')
+        .forEach(function (el) {
+          el.remove();
+        });
+    }
+
+    var tracker = normalize(readTracker());
+    writeTracker(tracker);
+    window.__ADS_BLOCKED = isBlocked(tracker);
+    window.__adsenseAllowed = function () {
+      return !window.__ADS_BLOCKED;
+    };
+
+    if (window.__ADS_BLOCKED) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", unloadAds);
+      } else {
+        unloadAds();
+      }
+      return;
+    }
+
+    var isOverAd = false;
+    var lastCountAt = 0;
+
+    function markOverAd(target) {
+      isOverAd = !!(target && target.closest && target.closest("ins.adsbygoogle, .ad-sidebar"));
+    }
+
+    window.addEventListener(
+      "mouseover",
+      function (e) {
+        markOverAd(e.target);
+      },
+      true,
+    );
+
+    window.addEventListener(
+      "mouseout",
+      function (e) {
+        if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest("ins.adsbygoogle, .ad-sidebar")) {
+          if (!e.target || !e.target.closest || !e.target.closest("ins.adsbygoogle, .ad-sidebar")) {
+            isOverAd = false;
+          }
+        }
+      },
+      true,
+    );
+
+    window.addEventListener(
+      "touchstart",
+      function (e) {
+        markOverAd(e.target);
+      },
+      { capture: true, passive: true },
+    );
+
+    function onSuspectedClick() {
+      if (!isOverAd) return;
+      var now = Date.now();
+      if (now - lastCountAt < DEBOUNCE_MS) {
+        isOverAd = false;
+        return;
+      }
+      lastCountAt = now;
+
+      tracker = normalize(readTracker());
+      tracker.count = (tracker.count || 0) + 1;
+      if (tracker.count >= MAX_CLICKS) {
+        tracker.blockedUntil = now + BLOCK_HOURS * 60 * 60 * 1000;
+        window.__ADS_BLOCKED = true;
+        unloadAds();
+      }
+      writeTracker(tracker);
+      isOverAd = false;
+    }
+
+    window.addEventListener("blur", onSuspectedClick);
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") onSuspectedClick();
+    });
+  })();
+</script>

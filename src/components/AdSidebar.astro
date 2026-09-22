@@ -2,14 +2,30 @@
 import { adsense } from "../data/adsense";
 ---
 
-<aside class="ad-sidebar" aria-label="광고">
-  <ins
-    class="adsbygoogle"
-    style="display:inline-block;width:300px;height:600px"
-    data-ad-client={adsense.client}
-    data-ad-slot={adsense.sidebarSlot}></ins>
-</aside>
+<aside class="ad-sidebar" aria-label="광고" data-ad-client={adsense.client} data-ad-slot={adsense.sidebarSlot}></aside>
 
 <script is:inline>
-  (window.adsbygoogle = window.adsbygoogle || []).push({});
+  (function () {
+    if (window.__ADS_BLOCKED || (window.__adsenseAllowed && !window.__adsenseAllowed())) {
+      var blocked = document.querySelector(".ad-sidebar");
+      if (blocked) blocked.remove();
+      return;
+    }
+
+    var mount = document.querySelector(".ad-sidebar");
+    if (!mount || mount.querySelector("ins.adsbygoogle")) return;
+
+    var ins = document.createElement("ins");
+    ins.className = "adsbygoogle";
+    ins.style.display = "inline-block";
+    ins.style.width = "300px";
+    ins.style.height = "600px";
+    ins.setAttribute("data-ad-client", mount.getAttribute("data-ad-client") || "");
+    ins.setAttribute("data-ad-slot", mount.getAttribute("data-ad-slot") || "");
+    mount.appendChild(ins);
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {}
+  })();
 </script>

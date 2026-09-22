@@ -2,8 +2,18 @@
 import { adsense } from "../data/adsense";
 ---
 
-<script
-  is:inline
-  async
-  src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsense.client}`}
-  crossorigin="anonymous"></script>
+<script is:inline define:vars={{ client: adsense.client }}>
+  (function () {
+    if (window.__ADS_BLOCKED || (window.__adsenseAllowed && !window.__adsenseAllowed())) {
+      return;
+    }
+    if (document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')) {
+      return;
+    }
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + client;
+    s.crossOrigin = "anonymous";
+    document.head.appendChild(s);
+  })();
+</script>

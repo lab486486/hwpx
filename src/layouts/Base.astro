@@ -2,6 +2,7 @@
 import { site } from "../data/site";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import AdSenseGuard from "../components/AdSenseGuard.astro";
 import AdSenseHead from "../components/AdSenseHead.astro";
 import "../styles/global.css";
 
@@ -60,6 +61,7 @@ const image = ogImage
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
     {published && <meta property="article:published_time" content={published.toISOString()} />}
+    <AdSenseGuard />
     <AdSenseHead />
     <link
       rel="stylesheet"
