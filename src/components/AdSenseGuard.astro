@@ -2,7 +2,7 @@
 /**
  * Runs before AdSense script tags.
  * Sets window.__ADS_BLOCKED and tracks suspected ad clicks.
- * Blocked browsers skip loading adsbygoogle.js entirely.
+ * After 3 hits / 24h, aggressively unload ads immediately (not only on refresh).
  */
 ---
 
@@ -12,6 +12,9 @@
     var BLOCK_HOURS = 24;
     var STORAGE_KEY = "adsense_click_tracker";
     var DEBOUNCE_MS = 800;
+    var AD_HOST_RE = /googlesyndication|doubleclick|googleads|adservice\.google|pagead2/i;
+    var purgeTimer = null;
+    var observer = null;
 
     function readTracker() {
       try {
@@ -43,15 +46,61 @@
       return tracker.count >= MAX_CLICKS && now < tracker.blockedUntil;
     }
 
+    function neutralizePush() {
+      try {
+        window.adsbygoogle = window.adsbygoogle || [];
+        window.adsbygoogle.push = function () {
+          return null;
+        };
+      } catch (e) {}
+    }
+
     function unloadAds() {
-      document.querySelectorAll("ins.adsbygoogle, .ad-sidebar").forEach(function (el) {
+      neutralizePush();
+
+      document.querySelectorAll("ins.adsbygoogle, .ad-sidebar, [id^='aswift_'], [id^='google_ads_iframe']").forEach(function (el) {
         el.remove();
       });
+
+      document.querySelectorAll("iframe").forEach(function (frame) {
+        var src = frame.getAttribute("src") || frame.getAttribute("data-src") || "";
+        var name = frame.getAttribute("name") || "";
+        var id = frame.id || "";
+        if (AD_HOST_RE.test(src) || AD_HOST_RE.test(name) || /google_ads|aswift|ad_iframe/i.test(id + name)) {
+          frame.remove();
+        }
+      });
+
       document
-        .querySelectorAll('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]')
+        .querySelectorAll('script[src*="pagead2.googlesyndication.com"], script[src*="adsbygoogle.js"]')
         .forEach(function (el) {
           el.remove();
         });
+    }
+
+    function startBlockedMode() {
+      window.__ADS_BLOCKED = true;
+      neutralizePush();
+      unloadAds();
+
+      if (!observer && document.documentElement) {
+        observer = new MutationObserver(function () {
+          if (window.__ADS_BLOCKED) unloadAds();
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+      }
+
+      if (!purgeTimer) {
+        var tries = 0;
+        purgeTimer = setInterval(function () {
+          unloadAds();
+          tries += 1;
+          if (tries >= 20) {
+            clearInterval(purgeTimer);
+            purgeTimer = null;
+          }
+        }, 250);
+      }
     }
 
     var tracker = normalize(readTracker());
@@ -63,20 +112,36 @@
 
     if (window.__ADS_BLOCKED) {
       if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", unloadAds);
+        document.addEventListener("DOMContentLoaded", startBlockedMode);
       } else {
-        unloadAds();
+        startBlockedMode();
       }
+      window.addEventListener("focus", function () {
+        if (window.__ADS_BLOCKED) unloadAds();
+      });
       return;
     }
 
     var isOverAd = false;
     var lastCountAt = 0;
 
-    function markOverAd(target) {
-      isOverAd = !!(target && target.closest && target.closest("ins.adsbygoogle, .ad-sidebar"));
+    function isAdTarget(target) {
+      if (!target || !target.closest) return false;
+      if (target.closest("ins.adsbygoogle, .ad-sidebar")) return true;
+      if (target.tagName === "IFRAME") {
+        var src = target.getAttribute("src") || "";
+        var name = target.getAttribute("name") || "";
+        var id = target.id || "";
+        return AD_HOST_RE.test(src) || AD_HOST_RE.test(name) || /google_ads|aswift|ad_iframe/i.test(id + name);
+      }
+      return false;
     }
 
+    function markOverAd(target) {
+      if (isAdTarget(target)) isOverAd = true;
+    }
+
+    // Entering a cross-origin ad iframe often clears relatedTarget; keep last "over ad" sticky briefly.
     window.addEventListener(
       "mouseover",
       function (e) {
@@ -88,11 +153,9 @@
     window.addEventListener(
       "mouseout",
       function (e) {
-        if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest("ins.adsbygoogle, .ad-sidebar")) {
-          if (!e.target || !e.target.closest || !e.target.closest("ins.adsbygoogle, .ad-sidebar")) {
-            isOverAd = false;
-          }
-        }
+        // Do not clear immediately when entering iframe (relatedTarget is often null).
+        if (!e.relatedTarget) return;
+        if (!isAdTarget(e.relatedTarget)) isOverAd = false;
       },
       true,
     );
@@ -106,28 +169,29 @@
     );
 
     function onSuspectedClick() {
-      if (!isOverAd) return;
+      if (!isOverAd || window.__ADS_BLOCKED) return;
       var now = Date.now();
-      if (now - lastCountAt < DEBOUNCE_MS) {
-        isOverAd = false;
-        return;
-      }
+      if (now - lastCountAt < DEBOUNCE_MS) return;
       lastCountAt = now;
 
       tracker = normalize(readTracker());
       tracker.count = (tracker.count || 0) + 1;
-      if (tracker.count >= MAX_CLICKS) {
-        tracker.blockedUntil = now + BLOCK_HOURS * 60 * 60 * 1000;
-        window.__ADS_BLOCKED = true;
-        unloadAds();
-      }
       writeTracker(tracker);
       isOverAd = false;
+
+      if (tracker.count >= MAX_CLICKS) {
+        tracker.blockedUntil = now + BLOCK_HOURS * 60 * 60 * 1000;
+        writeTracker(tracker);
+        startBlockedMode();
+      }
     }
 
     window.addEventListener("blur", onSuspectedClick);
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState === "hidden") onSuspectedClick();
+    });
+    window.addEventListener("focus", function () {
+      if (window.__ADS_BLOCKED) unloadAds();
     });
   })();
 </script>
